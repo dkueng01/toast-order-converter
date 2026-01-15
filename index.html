@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Toast Order Optimizer</title>
+    <style>
+      :root {
+        --bg-color: #f8fafc;
+        --card-bg: #ffffff;
+        --primary: #f59e0b; /* Toast Orange */
+        --primary-dark: #d97706;
+        --text-main: #334155;
+        --text-muted: #64748b;
+        --border-color: #e2e8f0;
+        --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1),
+          0 2px 4px -2px rgb(0 0 0 / 0.1);
+      }
+
+      body {
+        font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        margin: 0;
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      h1 {
+        color: var(--text-main);
+        font-weight: 800;
+        margin: 0;
+        font-size: 2.5rem;
+      }
+
+      .icon {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        display: block;
+      }
+
+      .container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        width: 100%;
+        max-width: 1200px;
+        align-items: start;
+      }
+
+      /* Input Section */
+      .card {
+        background: var(--card-bg);
+        border-radius: 1rem;
+        box-shadow: var(--shadow);
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        height: 70vh;
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        font-weight: 600;
+        color: var(--text-main);
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      /* Controls area for Tray Size input */
+      .controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .tray-input {
+        width: 60px;
+        padding: 0.4rem;
+        border: 2px solid var(--border-color);
+        border-radius: 0.5rem;
+        font-weight: bold;
+        text-align: center;
+      }
+
+      .tray-input:focus {
+        border-color: var(--primary);
+        outline: none;
+      }
+
+      textarea {
+        flex-grow: 1;
+        width: 100%;
+        border: 2px solid var(--border-color);
+        border-radius: 0.5rem;
+        padding: 1rem;
+        font-family: monospace;
+        font-size: 0.9rem;
+        resize: none;
+        outline: none;
+        transition: border-color 0.2s;
+        box-sizing: border-box;
+      }
+
+      textarea:focus {
+        border-color: var(--primary);
+      }
+
+      /* Output Section */
+      .output-area {
+        overflow-y: auto;
+        padding-right: 0.5rem;
+      }
+
+      .tray {
+        background: #fff;
+        border: 1px solid var(--border-color);
+        border-radius: 0.75rem;
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+      }
+
+      .tray-header {
+        background: var(--primary);
+        color: white;
+        padding: 0.75rem 1rem;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .tray-content {
+        padding: 0.5rem 0;
+      }
+
+      .toast-item {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        align-items: baseline;
+      }
+
+      .toast-item:last-child {
+        border-bottom: none;
+      }
+
+      .toast-user {
+        font-weight: 700;
+        width: 140px;
+        flex-shrink: 0;
+        color: var(--primary-dark);
+        font-size: 0.9rem;
+      }
+
+      .toast-ingredients {
+        font-family: monospace;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+      }
+
+      .copy-btn {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background 0.2s;
+        white-space: nowrap;
+      }
+
+      .copy-btn.secondary {
+        background: #94a3b8;
+      }
+
+      .copy-btn:hover {
+        background: var(--primary-dark);
+      }
+      .copy-btn.secondary:hover {
+        background: #64748b;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          grid-template-columns: 1fr;
+          height: auto;
+        }
+        .card {
+          height: 500px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <span class="icon">🥪</span>
+      <h1>Toast Order Optimizer</h1>
+    </header>
+
+    <div class="container">
+      <!-- Input Side -->
+      <div class="card">
+        <div class="card-header">
+          <span>Raw Input</span>
+          <button
+            class="copy-btn secondary"
+            onclick="clearInput()"
+            title="Clear text"
+          >
+            Clear
+          </button>
+        </div>
+        <textarea
+          id="inputArea"
+          placeholder="Paste your chat log here (User | Date...)"
+        >
+JTU2 | 2026-01-13 11:27:23
+cheese > ananas > ham > bread
+bread > cheese > ham > bread
+bread > cheese > ham > bread
+Johannes Lang | 2026-01-13 11:33:27
+bread > cheese > ananas > bread
+bread > cheese > ananas > bread
+bread > cheese > ananas > bread
+PJE | 2026-01-13 11:33:58
+bread > cheese > cheese > salami > bread
+bread > cheese > cheese > ham > bread
+bread > cheese > cheese > ham > bread
+Trini | 2026-01-13 12:04:57
+bread > cheese > salami > bread
+cheese > ananas > bread
+cheese > ananas > bread
+Simon | 2026-01-13 12:58:48
+bread > cheese > salami > ham > bread
+bread > cheese > salami > ham > bread
+cheese > ananas > ham > ham > bread
+DKU | 2026-01-13 15:45:08
+bread > cheese > salami > bread
+bread > cheese > salami > bread
+bread > cheese > salami > bread
+bread > cheese > salami > bread</textarea
+        >
+      </div>
+
+      <!-- Output Side -->
+      <div class="card">
+        <div class="card-header">
+          <div class="controls">
+            <span>Tray Size:</span>
+            <input
+              type="number"
+              id="traySizeInput"
+              class="tray-input"
+              value="9"
+              min="1"
+            />
+          </div>
+          <button class="copy-btn" id="copyResultBtn">Copy Text</button>
+        </div>
+        <div class="output-area" id="outputArea">
+          <!-- Trays will be injected here -->
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const inputArea = document.getElementById("inputArea");
+      const outputArea = document.getElementById("outputArea");
+      const copyResultBtn = document.getElementById("copyResultBtn");
+      const traySizeInput = document.getElementById("traySizeInput");
+
+      function processToasts() {
+        const rawText = inputArea.value.trim();
+        if (!rawText) {
+          outputArea.innerHTML =
+            '<div style="text-align:center; padding: 2rem; color:#aaa;">Waiting for toasts...</div>';
+          return;
+        }
+
+        const lines = rawText.split("\n");
+        const userMap = [];
+        let currentUser = null;
+
+        // 1. Parse Input
+        for (let line of lines) {
+          line = line.trim();
+          if (!line) continue;
+
+          // Check if line is a User Header (contains " | 20")
+          if (line.includes("| 20")) {
+            const namePart = line.split("|")[0].trim();
+            currentUser = { name: namePart, orders: [] };
+            userMap.push(currentUser);
+          } else if (line.includes(">")) {
+            // It's a toast order
+            if (currentUser) {
+              // 2. Reverse Order logic immediately
+              const ingredients = line.split(">").map((s) => s.trim());
+              const reversedOrder = ingredients.reverse().join(" > ");
+              currentUser.orders.push(reversedOrder);
+            }
+          }
+        }
+
+        // 3. Round Robin Distribution
+        const fairList = [];
+        let hasOrders = true;
+        let index = 0;
+
+        while (hasOrders) {
+          hasOrders = false;
+          for (const user of userMap) {
+            if (index < user.orders.length) {
+              fairList.push({
+                user: user.name,
+                order: user.orders[index],
+              });
+              hasOrders = true;
+            }
+          }
+          index++;
+        }
+
+        // 4. Split into Trays based on input & Render
+        let traySize = parseInt(traySizeInput.value);
+        if (isNaN(traySize) || traySize < 1) traySize = 9; // Fallback
+
+        let html = "";
+        let plainText = "";
+
+        const totalTrays = Math.ceil(fairList.length / traySize);
+
+        for (let t = 0; t < totalTrays; t++) {
+          const trayNum = t + 1;
+          const start = t * traySize;
+          const end = start + traySize;
+          const trayItems = fairList.slice(start, end);
+
+          // Build HTML
+          html += `<div class="tray">
+                    <div class="tray-header">
+                        <span>🍞 Tray ${trayNum}</span>
+                        <span>${trayItems.length} Toasts</span>
+                    </div>
+                    <div class="tray-content">`;
+
+          // Build Plain Text Header
+          plainText += `### 🍞 Blech ${trayNum} (${trayItems.length} Toasts)\n\n`;
+
+          trayItems.forEach((item, i) => {
+            const num = i + 1;
+            // HTML
+            html += `<div class="toast-item">
+                            <span class="toast-user">${num}. ${item.user}</span>
+                            <span class="toast-ingredients">${item.order}</span>
+                         </div>`;
+
+            // Plain Text
+            plainText += `${num}. **${item.user}:** ${item.order}\n`;
+          });
+
+          html += `</div></div>`;
+          plainText += `\n`; // Spacer between trays
+        }
+
+        outputArea.innerHTML = html;
+        outputArea.dataset.plainText = plainText;
+      }
+
+      // Event Listeners
+      inputArea.addEventListener("input", processToasts);
+      traySizeInput.addEventListener("input", processToasts); // Recalculate when number changes
+
+      copyResultBtn.addEventListener("click", () => {
+        const text = outputArea.dataset.plainText;
+        if (text) {
+          navigator.clipboard.writeText(text);
+          const originalText = copyResultBtn.innerText;
+          copyResultBtn.innerText = "Copied!";
+          setTimeout(() => (copyResultBtn.innerText = originalText), 2000);
+        }
+      });
+
+      function clearInput() {
+        inputArea.value = "";
+        processToasts();
+      }
+
+      // Initial run
+      processToasts();
+    </script>
+  </body>
+</html>
