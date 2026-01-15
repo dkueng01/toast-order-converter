@@ -229,27 +229,27 @@
           id="inputArea"
           placeholder="Paste your chat log here (User | Date...)"
         >
-JTU2 | 2026-01-13 11:27:23
+Person1 | 2026-01-13 11:27:23
 cheese > ananas > ham > bread
 bread > cheese > ham > bread
 bread > cheese > ham > bread
-Johannes Lang | 2026-01-13 11:33:27
+Person2 | 2026-01-13 11:33:27
 bread > cheese > ananas > bread
 bread > cheese > ananas > bread
 bread > cheese > ananas > bread
-PJE | 2026-01-13 11:33:58
+Person3 | 2026-01-13 11:33:58
 bread > cheese > cheese > salami > bread
 bread > cheese > cheese > ham > bread
 bread > cheese > cheese > ham > bread
-Trini | 2026-01-13 12:04:57
+Person4 | 2026-01-13 12:04:57
 bread > cheese > salami > bread
 cheese > ananas > bread
 cheese > ananas > bread
-Simon | 2026-01-13 12:58:48
+Person5 | 2026-01-13 12:58:48
 bread > cheese > salami > ham > bread
 bread > cheese > salami > ham > bread
 cheese > ananas > ham > ham > bread
-DKU | 2026-01-13 15:45:08
+Person6 | 2026-01-13 15:45:08
 bread > cheese > salami > bread
 bread > cheese > salami > bread
 bread > cheese > salami > bread
@@ -279,10 +279,10 @@ bread > cheese > salami > bread</textarea
     </div>
 
     <script>
-      const inputArea = document.getElementById("inputArea");
-      const outputArea = document.getElementById("outputArea");
-      const copyResultBtn = document.getElementById("copyResultBtn");
-      const traySizeInput = document.getElementById("traySizeInput");
+      const inputArea = document.getElementById('inputArea');
+      const outputArea = document.getElementById('outputArea');
+      const copyResultBtn = document.getElementById('copyResultBtn');
+      const traySizeInput = document.getElementById('traySizeInput');
 
       function processToasts() {
         const rawText = inputArea.value.trim();
@@ -292,7 +292,7 @@ bread > cheese > salami > bread</textarea
           return;
         }
 
-        const lines = rawText.split("\n");
+        const lines = rawText.split('\n');
         const userMap = [];
         let currentUser = null;
 
@@ -302,16 +302,15 @@ bread > cheese > salami > bread</textarea
           if (!line) continue;
 
           // Check if line is a User Header (contains " | 20")
-          if (line.includes("| 20")) {
-            const namePart = line.split("|")[0].trim();
+          if (line.includes('| 20')) {
+            const namePart = line.split('|')[0].trim();
             currentUser = { name: namePart, orders: [] };
             userMap.push(currentUser);
-          } else if (line.includes(">")) {
-            // It's a toast order
+          } else if (line.includes('>')) {
             if (currentUser) {
-              // 2. Reverse Order logic immediately
-              const ingredients = line.split(">").map((s) => s.trim());
-              const reversedOrder = ingredients.reverse().join(" > ");
+              // 2. Reverse Order logic
+              const ingredients = line.split('>').map((s) => s.trim());
+              const reversedOrder = ingredients.reverse().join(' > ');
               currentUser.orders.push(reversedOrder);
             }
           }
@@ -336,12 +335,12 @@ bread > cheese > salami > bread</textarea
           index++;
         }
 
-        // 4. Split into Trays based on input & Render
+        // 4. Split into Trays and Render
         let traySize = parseInt(traySizeInput.value);
-        if (isNaN(traySize) || traySize < 1) traySize = 9; // Fallback
+        if (isNaN(traySize) || traySize < 1) traySize = 9;
 
-        let html = "";
-        let plainText = "";
+        let html = '';
+        let plainText = '';
 
         const totalTrays = Math.ceil(fairList.length / traySize);
 
@@ -351,7 +350,7 @@ bread > cheese > salami > bread</textarea
           const end = start + traySize;
           const trayItems = fairList.slice(start, end);
 
-          // Build HTML
+          // Build HTML (Cards)
           html += `<div class="tray">
                     <div class="tray-header">
                         <span>🍞 Tray ${trayNum}</span>
@@ -359,8 +358,8 @@ bread > cheese > salami > bread</textarea
                     </div>
                     <div class="tray-content">`;
 
-          // Build Plain Text Header
-          plainText += `### 🍞 Blech ${trayNum} (${trayItems.length} Toasts)\n\n`;
+          // Build Clean Plain Text
+          plainText += `=== TRAY ${trayNum} (${trayItems.length} Toasts) ===`;
 
           trayItems.forEach((item, i) => {
             const num = i + 1;
@@ -370,12 +369,12 @@ bread > cheese > salami > bread</textarea
                             <span class="toast-ingredients">${item.order}</span>
                          </div>`;
 
-            // Plain Text
-            plainText += `${num}. **${item.user}:** ${item.order}\n`;
+            // Plain Text - Clean, no markdown, structured spacing
+            plainText += `${num}. ${item.user}: ${item.order}\n`;
           });
 
           html += `</div></div>`;
-          plainText += `\n`; // Spacer between trays
+          plainText += `\n\n`; // Larger spacer between trays
         }
 
         outputArea.innerHTML = html;
@@ -383,21 +382,21 @@ bread > cheese > salami > bread</textarea
       }
 
       // Event Listeners
-      inputArea.addEventListener("input", processToasts);
-      traySizeInput.addEventListener("input", processToasts); // Recalculate when number changes
+      inputArea.addEventListener('input', processToasts);
+      traySizeInput.addEventListener('input', processToasts);
 
-      copyResultBtn.addEventListener("click", () => {
+      copyResultBtn.addEventListener('click', () => {
         const text = outputArea.dataset.plainText;
         if (text) {
           navigator.clipboard.writeText(text);
           const originalText = copyResultBtn.innerText;
-          copyResultBtn.innerText = "Copied!";
+          copyResultBtn.innerText = 'Copied!';
           setTimeout(() => (copyResultBtn.innerText = originalText), 2000);
         }
       });
 
       function clearInput() {
-        inputArea.value = "";
+        inputArea.value = '';
         processToasts();
       }
 
